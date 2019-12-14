@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const { DATABASE_URL } = require('./config/security');
 
@@ -12,6 +13,7 @@ mongoose.connect(DATABASE_URL, {
     useUnifiedTopology: true,
 });
 
+server.use(cors());
 server.use(express.json());
 server.use(routes);
 
