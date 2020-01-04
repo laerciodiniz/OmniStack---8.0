@@ -23,7 +23,8 @@ export default function Login({navigation}) {
         navigation.navigate('Main', {user});
       }
     });
-  }, [navigation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleLogin() {
     const response = await api.post('/devs', {username: user});
@@ -32,7 +33,7 @@ export default function Login({navigation}) {
 
     await AsyncStorage.setItem('user', _id);
 
-    navigation.navigate('Main', {_id});
+    navigation.navigate('Main', {user: _id});
   }
 
   return (
