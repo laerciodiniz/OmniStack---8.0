@@ -1,20 +1,36 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 
-const { DATABASE_URL } = require('./config/security');
+const { DATABASE_URL } = require("./config/security");
 
-const routes = require('./routes');
+const routes = require("./routes");
 
-const server = express();
+const app = express();
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
 
-mongoose.connect(DATABASE_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+const connectedUsers = {};
+
+io.on("connection", socket => {
+  const { user } = socket.handshake.query;
+  connectedUsers[user] = socket.id;
 });
 
-server.use(cors());
-server.use(express.json());
-server.use(routes);
+mongoose.connect(DATABASE_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+app.use((req, res, next) => {
+  req.io = io;
+  req.connectedUsers = connectedUsers;
+
+  return next();
+});
+
+app.use(cors());
+app.use(express.json());
+app.use(routes);
 
 server.listen(3333);
